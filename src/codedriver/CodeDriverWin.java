@@ -12,10 +12,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.URL;
 import javax.swing.JFileChooser;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -170,12 +173,22 @@ public class CodeDriverWin extends javax.swing.JFrame {
 
         JSONObject jobj = null;
 	String progName = null;
-		
+        
+        File tFile = null;
+        
         consoleTextArea.append("Executing " + this.fileName.substring(0,this.fileName.lastIndexOf(".")) + "\n");
       	try
         {
-            FileReader fr = new FileReader("\\\\CDCCODE-01\\TestShare\\testcases.json");//\\CDCCODE-01\TestShare
+            URL link = new URL("http://172.16.3.32:2727/download.htm?file=AppData.ct");
+            tFile = new File("temp.crypt");
+            FileUtils.copyURLToFile(link, tFile);
+            
+            FileReader fr = new FileReader(tFile);//\\CDCCODE-01\TestShare
             Object obj = parser.parse(fr);
+            
+            PrintWriter pr = new PrintWriter(tFile);
+            pr.write("");
+            pr.close();
 
             JSONArray tcfile = (JSONArray)obj;
 
@@ -498,6 +511,7 @@ public class CodeDriverWin extends javax.swing.JFrame {
             ProcessBuilder pb = new ProcessBuilder("java", "-cp", this.filePath , this.fileName.substring(0, this.fileName.lastIndexOf(".")));
             pb.redirectInput(new File(this.filePath + "\\testcases.txt"));
             pb.redirectOutput(new File(this.filePath + "\\out.txt"));
+            pb.redirectError(new File(this.filePath + "\\out.txt"));
             Process p = pb.start();
 
             p.waitFor();
@@ -505,7 +519,8 @@ public class CodeDriverWin extends javax.swing.JFrame {
         }
         catch(Exception e)
         {
-            e.printStackTrace();
+//            e.printStackTrace();
+            consoleTextArea.append("Exception!\n" + e.getMessage());
         }
     }
     
@@ -519,6 +534,7 @@ public class CodeDriverWin extends javax.swing.JFrame {
             ProcessBuilder pb = new ProcessBuilder("python", fileFullPath);
             pb.redirectInput(new File(this.filePath + "\\testcases.txt"));
             pb.redirectOutput(new File(this.filePath + "\\out.txt"));
+            pb.redirectError(new File(this.filePath + "\\out.txt"));
             Process p = pb.start();
             
             BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream())); 
@@ -529,7 +545,8 @@ public class CodeDriverWin extends javax.swing.JFrame {
         }
         catch(Exception e)
         {
-            e.printStackTrace();
+//            e.printStackTrace();
+            consoleTextArea.append("Exception!\n" + e.getMessage());
         }
     }
     
