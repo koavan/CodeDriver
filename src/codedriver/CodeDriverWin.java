@@ -253,12 +253,22 @@ public class CodeDriverWin extends javax.swing.JFrame {
             fileNameLabel.setText(fileName);
             filePathLabel.setText(filePath);
             
-            if(fileExtension.equals("py"))
+            if(fileExtension.equalsIgnoreCase("py"))
             {
                 evalCodeBtn.setEnabled(false);
                 pullTcBtn.setEnabled(true);
             }
-            else if(fileExtension.equals("java"))
+            else if(fileExtension.equalsIgnoreCase("java"))
+            {
+                evalCodeBtn.setEnabled(true);
+                pullTcBtn.setEnabled(false);
+            }
+            else if(fileExtension.equalsIgnoreCase("c"))
+            {
+                evalCodeBtn.setEnabled(true);
+                pullTcBtn.setEnabled(false);
+            }
+            else if(fileExtension.equalsIgnoreCase("cpp"))
             {
                 evalCodeBtn.setEnabled(true);
                 pullTcBtn.setEnabled(false);
@@ -273,10 +283,29 @@ public class CodeDriverWin extends javax.swing.JFrame {
     }//GEN-LAST:event_browseBtn1ActionPerformed
 
     private void evalCodeBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_evalCodeBtnActionPerformed
-       if(Compile(fileName, filePath))
-           pullTcBtn.setEnabled(true);
-       else
-           pullTcBtn.setEnabled(false);
+    
+        if(this.fileExtension.equalsIgnoreCase("java"))
+        {
+            if(compileJava(fileName, filePath))
+                pullTcBtn.setEnabled(true);
+            else
+                pullTcBtn.setEnabled(false);
+        }
+        else if(fileExtension.equalsIgnoreCase("c"))
+        {
+            if(compileC(fileName, filePath))
+                pullTcBtn.setEnabled(true);
+            else
+                pullTcBtn.setEnabled(false);
+        }
+        else if(fileExtension.equalsIgnoreCase("cpp"))
+        {
+            if(compileCpp(fileName, filePath))
+                pullTcBtn.setEnabled(true);
+            else
+                pullTcBtn.setEnabled(false);
+        }
+        
     }//GEN-LAST:event_evalCodeBtnActionPerformed
 
     /**
@@ -367,10 +396,14 @@ public class CodeDriverWin extends javax.swing.JFrame {
                 fout.println(temp.toCharArray());
 		fout.close();
 		
-                if(this.fileExtension.equals("py"))
+                if(this.fileExtension.equalsIgnoreCase("py"))
                     RunPyProgram(fileName, filePath);
-                else if(this.fileExtension.equals("java"))
+                else if(this.fileExtension.equalsIgnoreCase("java"))
                     RunProgram(tFileName,filePath);
+                else if(this.fileExtension.equalsIgnoreCase("c"))
+                    RunCProgram(tFileName,filePath);
+                else if(this.fileExtension.equalsIgnoreCase("cpp"))
+                    RunCProgram(tFileName,filePath);
 		fetchTestCaseOutput(tobj);
 		boolean op = verifyTestCaseOutput();
 		if(op)
@@ -390,6 +423,7 @@ public class CodeDriverWin extends javax.swing.JFrame {
                 jLabel4.setForeground(Color.RED);
                 jLabel4.setText(cleared + "/" + testCaseCount);
             }
+            clearFiles();
 	}
 	catch(Exception e)
 	{
@@ -456,7 +490,7 @@ public class CodeDriverWin extends javax.swing.JFrame {
             return areEqual;
         }
         
-    public boolean Compile(String fileName ,String fpath)
+    public boolean compileJava(String fileName ,String fpath)
     {
         boolean success = false;
         try
@@ -467,6 +501,105 @@ public class CodeDriverWin extends javax.swing.JFrame {
             String fileFullPath = this.filePath+ System.getProperty("file.separator") + this.fileName;
 
             ProcessBuilder pb = new ProcessBuilder("javac", "-cp", filePath , fileFullPath);
+            Process p = pb.start();
+
+            BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            BufferedReader es = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+            String line; 
+
+            p.waitFor();
+
+            if((line = es.readLine()) != null)
+            {
+                success = false;
+                consoleTextArea.append("The following errors were found in your code!\n");
+                consoleTextArea.append(line + " \n");
+
+                while ((line = es.readLine()) != null){
+                consoleTextArea.append(line + " \n");
+                }
+            }
+            else
+            {
+                success = true;
+                consoleTextArea.append("Compilation successfull \n");
+                while ((line = is.readLine()) != null)
+                {
+                    consoleTextArea.append(line + " \n");
+                }
+            }
+            p.destroy();
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+        return success;
+    }
+    
+    public boolean compileC(String fileName ,String fpath)
+    {
+        boolean success = false;
+        try
+        {
+            consoleTextArea.append("Compiling " + "\n");
+            consoleTextArea.append("File : " + this.fileName + "\n");
+            
+            String fileFullPath = this.filePath+ System.getProperty("file.separator") + this.fileName;
+            String outputFilePath = this.filePath+ System.getProperty("file.separator") + "output.exe";
+            
+            ProcessBuilder pb = new ProcessBuilder("gcc", fileFullPath, "-o", outputFilePath);
+            Process p = pb.start();
+
+            BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            BufferedReader es = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+            String line; 
+
+            p.waitFor();
+
+            if((line = es.readLine()) != null)
+            {
+                success = false;
+                consoleTextArea.append("The following errors were found in your code!\n");
+                consoleTextArea.append(line + " \n");
+
+                while ((line = es.readLine()) != null){
+                consoleTextArea.append(line + " \n");
+                }
+            }
+            else
+            {
+                success = true;
+                consoleTextArea.append("Compilation successfull \n");
+                while ((line = is.readLine()) != null)
+                {
+                    consoleTextArea.append(line + " \n");
+                }
+            }
+            p.destroy();
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+        return success;
+    }
+    
+    public boolean compileCpp(String fileName ,String fpath)
+    {
+        boolean success = false;
+        try
+        {
+            consoleTextArea.append("Compiling " + "\n");
+            consoleTextArea.append("File : " + this.fileName + "\n");
+            
+            String fileFullPath = this.filePath+ System.getProperty("file.separator") + this.fileName;
+            String outputFilePath = this.filePath+ System.getProperty("file.separator") + "output.exe";
+            
+            ProcessBuilder pb = new ProcessBuilder("g++", fileFullPath, "-o", outputFilePath);
+//            ProcessBuilder pb = new ProcessBuilder("javac", "-cp", filePath , fileFullPath);
             Process p = pb.start();
 
             BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -547,6 +680,56 @@ public class CodeDriverWin extends javax.swing.JFrame {
         {
 //            e.printStackTrace();
             consoleTextArea.append("Exception!\n" + e.getMessage());
+        }
+    }
+    
+    public void RunCProgram(String fileName ,String fpath)
+    {
+        try
+        {
+            String fileFullPath = this.filePath+ System.getProperty("file.separator") + "output.exe";
+//            consoleTextArea.append("Full Path : " +fileFullPath + "\n");
+            
+            ProcessBuilder pb = new ProcessBuilder(fileFullPath);
+            pb.redirectInput(new File(this.filePath + "\\testcases.txt"));
+            pb.redirectOutput(new File(this.filePath + "\\out.txt"));
+            pb.redirectError(new File(this.filePath + "\\out.txt"));
+            Process p = pb.start();
+            
+            BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream())); 
+            String line; 
+
+            p.waitFor();
+            p.destroy();
+        }
+        catch(Exception e)
+        {
+//            e.printStackTrace();
+            consoleTextArea.append("Exception!\n" + e.getMessage());
+        }
+    }
+    
+    public void clearFiles()
+    {
+        try{
+        String tFileName = this.filePath + System.getProperty("file.separator") + "out.txt";
+        PrintWriter fout = new PrintWriter(new File(tFileName));
+        fout.println("");
+        fout.close();
+        
+        tFileName = this.filePath + System.getProperty("file.separator") + "tcout.txt";
+        fout = new PrintWriter(new File(tFileName));
+        fout.println("");
+        fout.close();
+        
+        tFileName = this.filePath + System.getProperty("file.separator") + "testcases.txt";
+        fout = new PrintWriter(new File(tFileName));
+        fout.println("");
+        fout.close();
+        }
+        catch(Exception e)
+        {
+            consoleTextArea.append(e.getMessage());
         }
     }
     
