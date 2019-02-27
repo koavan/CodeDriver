@@ -179,16 +179,18 @@ public class CodeDriverWin extends javax.swing.JFrame {
         consoleTextArea.append("Executing " + this.fileName.substring(0,this.fileName.lastIndexOf(".")) + "\n");
       	try
         {
-            URL link = new URL("http://172.16.3.32:2727/download.htm?file=AppData.ct");
-            tFile = new File("temp.crypt");
-            FileUtils.copyURLToFile(link, tFile);
+//            URL link = new URL("http://172.16.3.32:2727/download.htm?file=AppData.ct");
+//            tFile = new File("temp.crypt");
+//            FileUtils.copyURLToFile(link, tFile);
+            
+            tFile = new File("\\\\cdccode-01\\TestShare\\testcases.json");
             
             FileReader fr = new FileReader(tFile);//\\CDCCODE-01\TestShare
             Object obj = parser.parse(fr);
             
-            PrintWriter pr = new PrintWriter(tFile);
-            pr.write("");
-            pr.close();
+//            PrintWriter pr = new PrintWriter(tFile);
+//            pr.write("");
+//            pr.close();
 
             JSONArray tcfile = (JSONArray)obj;
 
