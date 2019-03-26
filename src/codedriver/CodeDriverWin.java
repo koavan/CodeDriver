@@ -179,26 +179,21 @@ public class CodeDriverWin extends javax.swing.JFrame {
         consoleTextArea.append("Executing " + this.fileName.substring(0,this.fileName.lastIndexOf(".")) + "\n");
       	try
         {
-//            URL link = new URL("http://172.16.3.32:2727/download.htm?file=AppData.ct");
-//            tFile = new File("temp.crypt");
-//            FileUtils.copyURLToFile(link, tFile);
+            URL link = new URL("http://172.16.3.174:8084/CodeDriverWeb/TcServlet?tcName=" + this.fileName.substring(0,this.fileName.lastIndexOf(".")));
+            tFile = new File("temp.crypt");
+            FileUtils.copyURLToFile(link, tFile);
             
-            tFile = new File("\\\\cdccode-01\\TestShare\\testcases.json");
-            
-            FileReader fr = new FileReader(tFile);//\\CDCCODE-01\TestShare
+            FileReader fr = new FileReader(tFile);
             Object obj = parser.parse(fr);
             
-//            PrintWriter pr = new PrintWriter(tFile);
-//            pr.write("");
-//            pr.close();
+            PrintWriter pr = new PrintWriter(tFile);
+            pr.write("");
+            pr.close();
 
-            JSONArray tcfile = (JSONArray)obj;
-
-            int progCount = Integer.parseInt(tcfile.get(0).toString());
-
+            int progCount = 1;
             for(int item=1;item<=progCount;++item)
             {
-		jobj = (JSONObject) tcfile.get(item);
+		jobj = (JSONObject) obj;
 		progName = jobj.get("name").toString();
 
 		if(progName.equals(fileName.substring(0, fileName.lastIndexOf("."))))
@@ -218,7 +213,8 @@ public class CodeDriverWin extends javax.swing.JFrame {
       	}
         catch(Exception e) 
         {
-            e.printStackTrace();
+            consoleTextArea.append(e.getMessage() + " \n");
+//            e.printStackTrace();
 	}
     }//GEN-LAST:event_pullTcBtnActionPerformed
 
