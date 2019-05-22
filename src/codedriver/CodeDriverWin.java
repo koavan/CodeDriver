@@ -214,7 +214,7 @@ public class CodeDriverWin extends javax.swing.JFrame {
         catch(Exception e) 
         {
             consoleTextArea.append(e.getMessage() + " \n");
-//            e.printStackTrace();
+            e.printStackTrace();
 	}
     }//GEN-LAST:event_pullTcBtnActionPerformed
 
