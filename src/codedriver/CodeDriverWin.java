@@ -179,7 +179,7 @@ public class CodeDriverWin extends javax.swing.JFrame {
         consoleTextArea.append("Executing " + this.fileName.substring(0,this.fileName.lastIndexOf(".")) + "\n");
       	try
         {
-            URL link = new URL("http://172.16.3.174:8084/CodeDriverWeb/TcServlet?tcName=" + this.fileName.substring(0,this.fileName.lastIndexOf(".")));
+            URL link = new URL("http://172.16.3.174:8080/CodeDriverWeb/TcServlet?tcName=" + this.fileName.substring(0,this.fileName.lastIndexOf(".")));
             tFile = new File("temp.crypt");
             FileUtils.copyURLToFile(link, tFile);
             
@@ -189,7 +189,7 @@ public class CodeDriverWin extends javax.swing.JFrame {
             PrintWriter pr = new PrintWriter(tFile);
             pr.write("");
             pr.close();
-
+ 
             int progCount = 1;
             for(int item=1;item<=progCount;++item)
             {
@@ -384,7 +384,7 @@ public class CodeDriverWin extends javax.swing.JFrame {
 		temp = temp.replace(",","\r\n");
 
                 if(tobj.get("isSample").toString().equals("true"))
-                    consoleTextArea.append(temp + "\n");
+                    consoleTextArea.append(temp + "\n"); 
                 else
                     consoleTextArea.append("***Hidden***\n");
 
