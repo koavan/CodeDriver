@@ -17,6 +17,7 @@ import javax.swing.JFileChooser;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+//import org.json.*;
 
 import org.apache.commons.io.FileUtils;
 
@@ -193,6 +194,7 @@ public class CodeDriverWin extends javax.swing.JFrame {
             int progCount = 1;
             for(int item=1;item<=progCount;++item)
             {
+//                jobj = new JSONObject(new String(cbuf));
 		jobj = (JSONObject) obj;
 		progName = jobj.get("name").toString();
 
@@ -378,10 +380,13 @@ public class CodeDriverWin extends javax.swing.JFrame {
                 consoleTextArea.append("Running Testcase " + tobj.get("name") + "..." + "\n");
                 
                 JSONArray tarray = (JSONArray) tobj.get("inputs");
-                String temp = tarray.toString();
-                temp = temp.replace("[","");
-		temp = temp.replace("]","");
-		temp = temp.replace(",","\r\n");
+                String temp = "";
+                
+                for(int index=0;index<tarray.size();index++)
+                {
+                    temp += tarray.get(index).toString();
+                    temp += "\r\n";
+                }
 
                 if(tobj.get("isSample").toString().equals("true"))
                     consoleTextArea.append(temp + "\n"); 
@@ -436,11 +441,14 @@ public class CodeDriverWin extends javax.swing.JFrame {
             try
             {
                 JSONArray tarray = (JSONArray) progData.get("outputs");
-                String temp = tarray.toString();
-                temp = temp.replace("[","");
-                temp = temp.replace("]","");
-                temp = temp.replace("\"","");
-                temp = temp.replace(",","\r\n");
+                String temp="";
+                System.out.println(tarray.size());
+                int ind = 0;
+                for(ind=0;ind<tarray.size()-1;ind++)
+                {
+                    temp += tarray.get(ind) + "\r\n";
+                }
+                temp += tarray.get(ind);
 
                 PrintWriter fout = new PrintWriter(new File(tcOutputFileName));
                 fout.println(temp.toCharArray());
